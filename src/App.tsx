@@ -1,26 +1,25 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-
+import MyNavbar from './components/navbar/Navbar';
+import MyTable from './components/table/Table'
+import {useState} from 'react'
+interface ITasks {
+  id:number;
+  TaskName:string;
+  TaskPriority:string;
+  TaskStatus:string;
+  TaskDeadline:any;
+}
 function App() {
+  const [Tasks, setTasks] = useState<ITasks[]>([])
+  const [copiedTasks, setCopiedTasks] = useState<ITasks[]>([]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <MyNavbar Tasks={Tasks} setTasks={setTasks} 
+      copiedTasks={copiedTasks} setCopiedTasks={setCopiedTasks}/>
+      <MyTable Tasks={Tasks} setTasks={setTasks} 
+      copiedTasks={copiedTasks} setCopiedTasks={setCopiedTasks}/>
     </div>
   );
 }
-
 export default App;
