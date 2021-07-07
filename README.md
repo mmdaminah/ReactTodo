@@ -1,3 +1,3 @@
 # ReactTodo
-React Todo
+React Todo with typescript
 [Preview](https://mmdaminah.github.io/ReactTodo/)
