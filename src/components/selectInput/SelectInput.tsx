@@ -4,14 +4,15 @@ interface IProps{
     title:string;
     items:string[];
     setFilter:any;
+    width:string;
 }
-const SelectInput:React.FC<IProps> = ({title, items,setFilter}) => {
+const SelectInput:React.FC<IProps> = ({title, items,setFilter,width}) => {
     const handleChange = (event:any)=>{
         const target = event.target as HTMLSelectElement; 
         setFilter(target.value)
     }
     return (
-        <FormControl variant="outlined" className="w-25">
+        <FormControl variant="outlined" className={width}>
             <InputLabel id="demo-simple-select-outlined-label">{title}</InputLabel>
             <Select className="mx-2"
                 name={title}

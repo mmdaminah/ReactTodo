@@ -9,6 +9,7 @@ interface ITasks {
   TaskPriority:string;
   TaskStatus:string;
   TaskDeadline:any;
+  TaskDetails:string;
 }
 function App() {
   const [Tasks, setTasks] = useState<ITasks[]>([])

@@ -10,8 +10,10 @@ interface IProps {
     setStatus:Function;
     setSelectedDate:Function;
     selectedDate:any;
+    TaskDetails:string;
+    setTaskDetails:Function;
 }
-const MyModal:React.FC<IProps> = ({show,handleClose,handleSave,setTaskNameInput,setPriority,setStatus,setSelectedDate,selectedDate}) => {
+const MyModal:React.FC<IProps> = ({show,handleClose,handleSave,setTaskNameInput,setPriority,setStatus,setSelectedDate,selectedDate,TaskDetails,setTaskDetails}) => {
   return (
     <>
       <Modal size="lg" show={show} onHide={handleClose}>
@@ -24,6 +26,8 @@ const MyModal:React.FC<IProps> = ({show,handleClose,handleSave,setTaskNameInput,
                           setStatus={setStatus}
                           setSelectedDate={setSelectedDate}
                           selectedDate={selectedDate}
+                          TaskDetails={TaskDetails}
+                          setTaskDetails={setTaskDetails}
                 />
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-between">
