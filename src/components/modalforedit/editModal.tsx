@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import { TextField, InputLabel, Select, MenuItem, FormControl } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
@@ -8,6 +8,7 @@ import {
     KeyboardDatePicker
 } from '@material-ui/pickers';
 import { useState } from 'react'
+import {context} from '../../App'
 interface ITasks {
     id: number;
     TaskName: string;
@@ -20,12 +21,10 @@ interface IProps {
     show: boolean;
     onHide: Function;
     itemTobeEdited: ITasks;
-    Tasks: ITasks[];
-    setTasks: Function;
-    setCopiedTasks:Function;
 }
 
-const EditModal: React.FC<IProps> = ({ show, onHide, itemTobeEdited, Tasks, setTasks,setCopiedTasks }) => {
+const EditModal: React.FC<IProps> = ({ show, onHide, itemTobeEdited }) => {
+    const {state, dispatch} = useContext(context);
     const [taskName, setTaskName] = useState(itemTobeEdited.TaskName);
     const [priority, setPriority] = useState(itemTobeEdited.TaskPriority);
     const [taskDetails, setTaskDetails] = useState(itemTobeEdited.TaskDetails);
@@ -44,12 +43,13 @@ const EditModal: React.FC<IProps> = ({ show, onHide, itemTobeEdited, Tasks, setT
         setStatus(target.value)
     }
     const handleSave = () => {
-        const foundItem = Tasks.find((item) => item.id === itemTobeEdited.id)
+        const foundItem = state.find((item:any) => item.id === itemTobeEdited.id)
         taskName && (foundItem!.TaskName = taskName);
         priority && (foundItem!.TaskPriority = priority);
         status && (foundItem!.TaskStatus = status);
         selectedDate && (foundItem!.TaskDeadline = selectedDate);
         taskDetails && (foundItem!.TaskDetails = taskDetails);
+        dispatch({type:"editTask",payLoad:foundItem})
         onHide()
     }
     const handleDateChange = (date: any) => {
@@ -76,9 +76,9 @@ const EditModal: React.FC<IProps> = ({ show, onHide, itemTobeEdited, Tasks, setT
                             onChange={handlePriorityChange}
                         >
                             <MenuItem value={itemTobeEdited.TaskPriority}>{itemTobeEdited.TaskPriority}</MenuItem>
-                            {itemTobeEdited.TaskPriority != "Low" && <MenuItem value={"Low"}>Low</MenuItem>}
-                            {itemTobeEdited.TaskPriority != "Medium" && <MenuItem value={"Medium"}>Medium</MenuItem>}
-                            {itemTobeEdited.TaskPriority != "High" && <MenuItem value={"High"}>High</MenuItem>}
+                            {itemTobeEdited.TaskPriority !== "Low" && <MenuItem value={"Low"}>Low</MenuItem>}
+                            {itemTobeEdited.TaskPriority !== "Medium" && <MenuItem value={"Medium"}>Medium</MenuItem>}
+                            {itemTobeEdited.TaskPriority !== "High" && <MenuItem value={"High"}>High</MenuItem>}
                         </Select>
                     </FormControl>
                     <FormControl variant="outlined" className="w-25">
@@ -90,9 +90,9 @@ const EditModal: React.FC<IProps> = ({ show, onHide, itemTobeEdited, Tasks, setT
                             onChange={handleStatusChange}
                         >
                             <MenuItem value={itemTobeEdited.TaskStatus}>{itemTobeEdited.TaskStatus}</MenuItem>
-                            {itemTobeEdited.TaskStatus != "To do" && <MenuItem value={"To do"}>To do</MenuItem>}
-                            {itemTobeEdited.TaskStatus != "Doing" && <MenuItem value={"Doing"}>Doing</MenuItem>}
-                            {itemTobeEdited.TaskStatus != "Done" && <MenuItem value={"Done"}>Done</MenuItem>}
+                            {itemTobeEdited.TaskStatus !== "To do" && <MenuItem value={"To do"}>To do</MenuItem>}
+                            {itemTobeEdited.TaskStatus !== "Doing" && <MenuItem value={"Doing"}>Doing</MenuItem>}
+                            {itemTobeEdited.TaskStatus !== "Done" && <MenuItem value={"Done"}>Done</MenuItem>}
                         </Select>
                     </FormControl>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>

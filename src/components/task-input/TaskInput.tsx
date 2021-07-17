@@ -1,7 +1,6 @@
 import { TextField } from '@material-ui/core';
 import SelectInput from '../selectInput/SelectInput';
 import MaterialUIPickers from '../date-input/DateInput'
-import {useState} from 'react'
 interface IProps{
   setTaskNameInput:Function;
   setPriority:Function;

@@ -6,21 +6,8 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import { BsFunnelFill } from "react-icons/bs";
 import SelectInput from '../selectInput/SelectInput';
-import {useState, useEffect} from 'react'
-interface ITasks {
-    id: number;
-    TaskName: string;
-    TaskPriority: string;
-    TaskStatus: string;
-    TaskDeadline: any;
-    TaskDetails: string;
-}
-interface IProps {
-    Tasks: ITasks[];
-    setTasks: Function;
-    copiedTasks: ITasks[];
-    setCopiedTasks: Function;
-}
+import {useState, useEffect,useContext} from 'react'
+import {context} from '../../App'
 const useStyles = makeStyles({
     list: {
         width: 250,
@@ -32,47 +19,24 @@ const useStyles = makeStyles({
 
 type Anchor = 'left' | 'right';
 
-export default function TemporaryDrawer({ Tasks, setTasks, copiedTasks, setCopiedTasks }: IProps) {
+export default function TemporaryDrawer() {
+    const {state,dispatch,copyState, copyDispatch} = useContext(context);
     const [priority, setPriority] = useState("All");
     const [status, setStatus] = useState("All");
     const [deadline, setDeadline] = useState("All");
     useEffect(()=>{
-        //filters just based on priority
-        if(priority !== "All" && status === "All" && deadline === "All")
-            setTasks(copiedTasks.filter((item)=> item.TaskPriority === priority))
-        //filters just based on status
-        else if(status !== "All" && priority === "All" && deadline === "All")
-            setTasks(copiedTasks.filter((item)=> item.TaskStatus === status))
-        //filters just based on deadline
-        else if(deadline !== "All" && priority === "All" && status === "All")
-            setTasks(filterByDeadline())
-        //filters based on priority and status
-        else if(status !== "All" && priority !== "All" && deadline === "All")
-            setTasks(copiedTasks.filter((item)=> item.TaskStatus === status).filter((item)=>item.TaskPriority === priority))
-        //filters based on priority and deadline
-        else if(status === "All" && priority !== "All" && deadline !== "All")
-            setTasks(filterByDeadline()?.filter((item)=> item.TaskPriority === priority))
-        //filters based on priority and deadline
-        else if(status !== "All" && priority === "All" && deadline !== "All")
-            setTasks(filterByDeadline()?.filter((item)=> item.TaskStatus === status))
-        //filters based on all options
-        else if(deadline !== "All" && priority !== "All" && status !== "All")
-            setTasks(filterByDeadline()?.filter((item)=> item.TaskStatus === status).filter((item)=> item.TaskPriority === priority))
-        //filters no item
-        else if(deadline === "All" && priority == "All" && status === "All")
-            setTasks(copiedTasks)
-
+        dispatch({type:"sidebarFilter",filters:[priority,status,deadline],copiedTasks:[...copyState]})
     },[deadline,priority,status])
     const filterByDeadline = ()=>{
         if(deadline === 'Overdue' )
-            return copiedTasks.filter((item)=> item.TaskDeadline.getDate() < new Date().getDate())
+            return copyState.filter((item:any)=> item.TaskDeadline.getDate() < new Date().getDate())
         else if(deadline === 'For the future')
-            return copiedTasks.filter((item)=> item.TaskDeadline.getDate() > new Date().getDate())
+            return copyState.filter((item:any)=> item.TaskDeadline.getDate() > new Date().getDate())
         else if(deadline === 'For today')
-            return copiedTasks.filter((item)=> item.TaskDeadline.getDate() === new Date().getDate())
+            return copyState.filter((item:any)=> item.TaskDeadline.getDate() === new Date().getDate())
     }
     const classes = useStyles();
-    const [state, setState] = React.useState({
+    const [Nstate, setState] = React.useState({
         top: false,
         left: false,
         bottom: false,
@@ -89,7 +53,7 @@ export default function TemporaryDrawer({ Tasks, setTasks, copiedTasks, setCopie
         ) {
             return;
         }
-        setState({ ...state, [anchor]: open });
+        setState({ ...Nstate, [anchor]: open });
     };
 
     const list = (anchor: Anchor) => (
@@ -115,7 +79,7 @@ export default function TemporaryDrawer({ Tasks, setTasks, copiedTasks, setCopie
         <div>
             <React.Fragment key={'right'}>
                 <BsFunnelFill className="mx-2" style={{ width: "25px", height: "25px" }} onClick={toggleDrawer('right', true)} />
-                <Drawer anchor={'right'} open={state['right']} onClose={toggleDrawer('right', false)}>
+                <Drawer anchor={'right'} open={Nstate['right']} onClose={toggleDrawer('right', false)}>
                     {list('right')}
                 </Drawer>
             </React.Fragment>

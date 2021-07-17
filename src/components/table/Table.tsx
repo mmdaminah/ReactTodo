@@ -2,10 +2,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Chip from '@material-ui/core/Chip';
 import { FaRegEye, FaPencilAlt, FaTrashAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { Table } from 'react-bootstrap'
-import { useState } from 'react'
-import { Modal } from 'react-bootstrap'
+import { useState, useContext } from 'react'
 import EditModal from '../modalforedit/editModal'
 import ShowModal from '../showModal/showModal'
+import {context} from '../../App'
 interface ITasks {
     id: number;
     TaskName: string;
@@ -14,18 +14,14 @@ interface ITasks {
     TaskDeadline: any;
     TaskDetails:string;
 }
-interface IProps {
-    Tasks: ITasks[];
-    setTasks: Function;
-    copiedTasks: ITasks[];
-    setCopiedTasks: Function;
-}
-const MyTable: React.FC<IProps> = ({ Tasks, setTasks, copiedTasks, setCopiedTasks }) => {
+
+const MyTable: React.FC = () => {
+    const {state,dispatch,copyState, copyDispatch} = useContext(context);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleRemove = (id: number) => {
-        setTasks(Tasks.filter((item) => id !== item.id))
-        setCopiedTasks(Tasks)
+        dispatch({type:"removeTask", payLoad:id})
+        copyDispatch({type:"removeTask", payLoad:id})
     }
     //show item modal start
     const [itemModal, setItemModal] = useState<ITasks>({
@@ -33,7 +29,7 @@ const MyTable: React.FC<IProps> = ({ Tasks, setTasks, copiedTasks, setCopiedTask
         TaskName: "nothing", TaskPriority: "High", TaskStatus: "To do", id: 1
     });
     const handleShowItem = (id: number) => {
-        const foundItem = Tasks.find((item) => item.id === id) 
+        const foundItem = state.find((item:any) => item.id === id) 
         foundItem && setItemModal(foundItem)
         setShow(true);
     }
@@ -43,19 +39,14 @@ const MyTable: React.FC<IProps> = ({ Tasks, setTasks, copiedTasks, setCopiedTask
     const handleMouseOverPriority = () => setMouseOverPriority(true)
     const handleMouseOutPriority = () => setMouseOverPriority(false)
     const [priorityArrow, setPriorityArrow] = useState(0)
-    const priorityToNum = (prio: string) => {
-        if (prio === "High") return 3;
-        else if (prio === "Medium") return 2;
-        else return 1;
-    }
     const handlePriorityClick = () => {
         setPriorityArrow(priorityArrow + 1)
         if ((priorityArrow + 1) % 3 === 0)
-            setTasks(Tasks.sort((a, b) => a.id - b.id))
+            dispatch({type:"sortById"})
         else if ((priorityArrow + 1) % 3 === 1)
-            setTasks(Tasks.sort((a, b) => priorityToNum(b.TaskPriority) - priorityToNum(a.TaskPriority)))
+            dispatch({type:"sortIncreasing",payLoad:"TaskPriority"})
         else if ((priorityArrow + 1) % 3 === 2)
-            setTasks(Tasks.sort((a, b) => priorityToNum(a.TaskPriority) - priorityToNum(b.TaskPriority)))
+            dispatch({type:"sortDecreasing",payLoad:"TaskPriority"})
     }
     //filter by priority end
     //filter by status start
@@ -63,19 +54,14 @@ const MyTable: React.FC<IProps> = ({ Tasks, setTasks, copiedTasks, setCopiedTask
     const handleMouseOverStatus = () => setMouseOverStatus(true)
     const handleMouseOutStatus = () => setMouseOverStatus(false)
     const [statusArrow, setStatusArrow] = useState(0)
-    const statusToNum = (stat: string) => {
-        if (stat === "To do") return 3;
-        else if (stat === "Doing") return 2;
-        else return 1;
-    }
     const handleStatusClick = () => {
         setStatusArrow(statusArrow + 1)
         if ((statusArrow + 1) % 3 === 0)
-            setTasks(Tasks.sort((a, b) => a.id - b.id))
+            dispatch({type:"sortById"})
         else if ((statusArrow + 1) % 3 === 1)
-            setTasks(Tasks.sort((a, b) => statusToNum(b.TaskStatus) - statusToNum(a.TaskStatus)))
+            dispatch({type:"sortIncreasing",payLoad:"TaskStatus"})
         else if ((statusArrow + 1) % 3 === 2)
-            setTasks(Tasks.sort((a, b) => statusToNum(a.TaskStatus) - statusToNum(b.TaskStatus)))
+            dispatch({type:"sortDecreasing",payLoad:"TaskStatus"})
     }
     //filter by status end
     // filter by deadline start
@@ -86,11 +72,11 @@ const MyTable: React.FC<IProps> = ({ Tasks, setTasks, copiedTasks, setCopiedTask
     const handleDeadlineClick = () => {
         setDeadlineArrow(deadlineArrow + 1)
         if ((deadlineArrow + 1) % 3 === 0)
-            setTasks(Tasks.sort((a, b) => a.id - b.id))
+            dispatch({type:"sortById"})
         else if ((deadlineArrow + 1) % 3 === 1)
-            setTasks(Tasks.sort((a, b) => b.TaskDeadline - a.TaskDeadline))
+            dispatch({type:"sortByDateIncreasing"})
         else if ((deadlineArrow + 1) % 3 === 2)
-            setTasks(Tasks.sort((a, b) => a.TaskDeadline - b.TaskDeadline))
+            dispatch({type:"sortByDateDecreasing"})
     }
     // filter by deadline end
     //edit item start
@@ -98,7 +84,7 @@ const MyTable: React.FC<IProps> = ({ Tasks, setTasks, copiedTasks, setCopiedTask
     const [itemTobeEdited, setItemTobeEdited] = useState<ITasks>({ id: 0, TaskStatus: "", TaskDeadline: "", TaskName: "", TaskPriority: "",TaskDetails:"" })
     const handleEditModalClose = () => setEditModal(false);
     const handleShowEditModal = (id: number) => {
-        const foundItem = Tasks.find((item) => item.id === id)
+        const foundItem = state.find((item:any) => item.id === id)
         foundItem && setItemTobeEdited(foundItem)
         setEditModal(true);
     }
@@ -136,11 +122,9 @@ const MyTable: React.FC<IProps> = ({ Tasks, setTasks, copiedTasks, setCopiedTask
                     itemTobeShowed={itemModal}
                 />
                 <EditModal show={editModal} onHide={handleEditModalClose}
-                    itemTobeEdited={itemTobeEdited}
-                    Tasks={Tasks} setTasks={setTasks} 
-                    setCopiedTasks={setCopiedTasks}/>
+                    itemTobeEdited={itemTobeEdited} />
                 {
-                    Tasks.map((item) => {
+                    state?.map((item:any) => {
                         const date = item.TaskDeadline as Date
                         let priorityColor = "";
                         if (item.TaskPriority === "High")
