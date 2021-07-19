@@ -26,7 +26,17 @@ const reducer = (state, action) => {
       return action.copiedTasks.filter((item)=> item.TaskName.startsWith(action.payLoad))
     case 'returnCopyState':
       return [...action.copiedTasks]
-    case 'sidebarFilter':
+    case 'sidebarFilterPriority':
+      return action.copiedTasks.filter(item => item.TaskPriority === action.payLoad)
+    case 'sidebarFilterStatus':
+      return action.copiedTasks.filter(item => item.TaskStatus === action.payLoad)
+    case 'sidebarFilterDeadline':
+      return action.payLoad
+    case 'sidebarFilterPriorityStatus':
+      return action.copiedTasks.filter(item => item.TaskPriority === action.payLoad[0] && item.TaskStatus === action.payLoad[1])
+    case 'sidebarFilterStatusDeadline':
+    case 'sidebarFilterAll':
+    
   }
 }
 const priorityAndStatusToNum = (statusOrPriority) => {

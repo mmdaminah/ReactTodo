@@ -25,7 +25,30 @@ export default function TemporaryDrawer() {
     const [status, setStatus] = useState("All");
     const [deadline, setDeadline] = useState("All");
     useEffect(()=>{
-        dispatch({type:"sidebarFilter",filters:[priority,status,deadline],copiedTasks:[...copyState]})
+        //filters just based on priority
+        if(priority !== "All" && status === "All" && deadline === "All")
+            dispatch({type:'sidebarFilterPriority',payLoad:priority,copiedTasks:[...copyState]})
+        //filters just based on status
+        else if(status !== "All" && priority === "All" && deadline === "All")
+            dispatch({type:'sidebarFilterStatus',payLoad:status,copiedTasks:[...copyState]})
+        //filters just based on deadline
+        else if(deadline !== "All" && priority === "All" && status === "All")
+            dispatch({type:"sidebarFilterDeadline",payLoad:filterByDeadline()})
+        //filters based on priority and status
+        else if(status !== "All" && priority !== "All" && deadline === "All")
+            dispatch({type:"sidebarFilterPriorityStatus", payLoad:[priority,status],copiedTasks:[...copyState]})
+        //filters based on priority and deadline
+        else if(status === "All" && priority !== "All" && deadline !== "All")
+            dispatch({type:"sidebarFilterPriority",payLoad:priority,copiedTasks:filterByDeadline()})
+        //filters based on status and deadline
+        else if(status !== "All" && priority === "All" && deadline !== "All")
+            dispatch({type:"sidebarFilterStatus",payLoad:status,copiedTasks:filterByDeadline()})
+        //filters based on all options
+        else if(deadline !== "All" && priority !== "All" && status !== "All")
+            dispatch({type:"sidebarFilterPriorityStatus",payLoad:[priority,status],copiedTasks:filterByDeadline()})
+        //filters no item
+        else if(deadline === "All" && priority == "All" && status === "All")
+            dispatch({type:"returnCopyState",copiedTasks:[...copyState]})
     },[deadline,priority,status])
     const filterByDeadline = ()=>{
         if(deadline === 'Overdue' )
