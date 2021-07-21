@@ -1,39 +1,38 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BsPencilSquare } from "react-icons/bs";
 import { Navbar, Form, FormControl } from 'react-bootstrap'
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import MyModal from '../modal/modal';
 import TemporaryDrawer from '../sidebar/sidebar'
-import {context} from '../../App'
+import { useSelector, useDispatch } from 'react-redux';
 const MyNavbar:React.FC = () => {
+    const reduxTasks = useSelector((state:any) => state.todo)
+    const reduxDispatch = useDispatch()
+    const copiedReduxTasks = useSelector((state:any) => state.todo.copiedTasks)
     const [show, setShow] = useState(false);
     const [TaskNameInput, setTaskNameInput] = useState("");
     const [priority,setPriority] = useState("");
     const [status,setStatus] = useState("");
     const [TaskDetails, setTaskDetails] = useState("")
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-    const {state, dispatch,copyState, copyDispatch} = useContext(context)
     const handleClose = () => {
         setShow(false);
     };
     const handleSave = ()=>{
         const timeStamp = Date.now()
-        dispatch({type:"addTask",payLoad:{id:timeStamp,TaskName:TaskNameInput,TaskPriority:priority,TaskStatus:status,TaskDeadline:selectedDate,TaskDetails:TaskDetails}})
-        copyDispatch({type:"addTask",payLoad:{id:timeStamp,TaskName:TaskNameInput,TaskPriority:priority,TaskStatus:status,TaskDeadline:selectedDate,TaskDetails:TaskDetails}})
+        reduxDispatch({type:"addTask",payLoad:{id:timeStamp,TaskName:TaskNameInput,TaskPriority:priority,TaskStatus:status,TaskDeadline:selectedDate,TaskDetails:TaskDetails}})
         setShow(false);
     }
     const handleShow = () => setShow(true);
     const handleSearch = (event:React.ChangeEvent)=>{
         const data = event.target as HTMLInputElement;
         if(data.value==="")
-            dispatch({type:"returnCopyState",copiedTasks:[...copyState]})
-            // setTasks(copiedTasks)
+            reduxDispatch({type:"returnCopyState",copiedTasks:copiedReduxTasks})
         else
-            dispatch({type:"searchTask",payLoad:data.value,copiedTasks:[...copyState]})
-            // setTasks(Tasks.filter((item)=> item.TaskName.startsWith(data.value)))
+            reduxDispatch({type:"searchTask",payLoad:data.value,copiedTasks:copiedReduxTasks})
     }
     return (
-        <>
+        <>{console.log(reduxTasks)}
             <Navbar bg="light" expand="lg" className="w-100">
                 <div className="d-flex justify-content-between w-100">
                     <div>

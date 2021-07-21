@@ -2,10 +2,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Chip from '@material-ui/core/Chip';
 import { FaRegEye, FaPencilAlt, FaTrashAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { Table } from 'react-bootstrap'
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 import EditModal from '../modalforedit/editModal'
 import ShowModal from '../showModal/showModal'
-import {context} from '../../App'
+import { useSelector, useDispatch } from 'react-redux';
 interface ITasks {
     id: number;
     TaskName: string;
@@ -16,12 +16,12 @@ interface ITasks {
 }
 
 const MyTable: React.FC = () => {
-    const {state,dispatch,copyState, copyDispatch} = useContext(context);
+    const reduxTasks = useSelector((state:any) => state.todo.Tasks)
+    const reduxDispatch = useDispatch()
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleRemove = (id: number) => {
-        dispatch({type:"removeTask", payLoad:id})
-        copyDispatch({type:"removeTask", payLoad:id})
+        reduxDispatch({type:"removeTask", payLoad:id})
     }
     //show item modal start
     const [itemModal, setItemModal] = useState<ITasks>({
@@ -29,7 +29,7 @@ const MyTable: React.FC = () => {
         TaskName: "nothing", TaskPriority: "High", TaskStatus: "To do", id: 1
     });
     const handleShowItem = (id: number) => {
-        const foundItem = state.find((item:any) => item.id === id) 
+        const foundItem = reduxTasks.find((item:any) => item.id === id) 
         foundItem && setItemModal(foundItem)
         setShow(true);
     }
@@ -42,11 +42,11 @@ const MyTable: React.FC = () => {
     const handlePriorityClick = () => {
         setPriorityArrow(priorityArrow + 1)
         if ((priorityArrow + 1) % 3 === 0)
-            dispatch({type:"sortById"})
+            reduxDispatch({type:"sortById"})
         else if ((priorityArrow + 1) % 3 === 1)
-            dispatch({type:"sortIncreasing",payLoad:"TaskPriority"})
+            reduxDispatch({type:"sortIncreasing",payLoad:"TaskPriority"})
         else if ((priorityArrow + 1) % 3 === 2)
-            dispatch({type:"sortDecreasing",payLoad:"TaskPriority"})
+            reduxDispatch({type:"sortDecreasing",payLoad:"TaskPriority"})
     }
     //filter by priority end
     //filter by status start
@@ -57,11 +57,11 @@ const MyTable: React.FC = () => {
     const handleStatusClick = () => {
         setStatusArrow(statusArrow + 1)
         if ((statusArrow + 1) % 3 === 0)
-            dispatch({type:"sortById"})
+            reduxDispatch({type:"sortById"})
         else if ((statusArrow + 1) % 3 === 1)
-            dispatch({type:"sortIncreasing",payLoad:"TaskStatus"})
+            reduxDispatch({type:"sortIncreasing",payLoad:"TaskStatus"})
         else if ((statusArrow + 1) % 3 === 2)
-            dispatch({type:"sortDecreasing",payLoad:"TaskStatus"})
+            reduxDispatch({type:"sortDecreasing",payLoad:"TaskStatus"})
     }
     //filter by status end
     // filter by deadline start
@@ -72,11 +72,11 @@ const MyTable: React.FC = () => {
     const handleDeadlineClick = () => {
         setDeadlineArrow(deadlineArrow + 1)
         if ((deadlineArrow + 1) % 3 === 0)
-            dispatch({type:"sortById"})
+            reduxDispatch({type:"sortById"})
         else if ((deadlineArrow + 1) % 3 === 1)
-            dispatch({type:"sortByDateIncreasing"})
+            reduxDispatch({type:"sortByDateIncreasing"})
         else if ((deadlineArrow + 1) % 3 === 2)
-            dispatch({type:"sortByDateDecreasing"})
+            reduxDispatch({type:"sortByDateDecreasing"})
     }
     // filter by deadline end
     //edit item start
@@ -84,7 +84,7 @@ const MyTable: React.FC = () => {
     const [itemTobeEdited, setItemTobeEdited] = useState<ITasks>({ id: 0, TaskStatus: "", TaskDeadline: "", TaskName: "", TaskPriority: "",TaskDetails:"" })
     const handleEditModalClose = () => setEditModal(false);
     const handleShowEditModal = (id: number) => {
-        const foundItem = state.find((item:any) => item.id === id)
+        const foundItem = reduxTasks.find((item:any) => item.id === id)
         foundItem && setItemTobeEdited(foundItem)
         setEditModal(true);
     }
@@ -124,7 +124,7 @@ const MyTable: React.FC = () => {
                 <EditModal show={editModal} onHide={handleEditModalClose}
                     itemTobeEdited={itemTobeEdited} />
                 {
-                    state?.map((item:any) => {
+                    reduxTasks?.map((item:any) => {
                         const date = item.TaskDeadline as Date
                         let priorityColor = "";
                         if (item.TaskPriority === "High")

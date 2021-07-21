@@ -1,14 +1,14 @@
-import React, {useContext} from 'react'
+import React from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import { TextField, InputLabel, Select, MenuItem, FormControl } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
+import { useSelector, useDispatch } from 'react-redux';
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker
 } from '@material-ui/pickers';
 import { useState } from 'react'
-import {context} from '../../App'
 interface ITasks {
     id: number;
     TaskName: string;
@@ -24,7 +24,8 @@ interface IProps {
 }
 
 const EditModal: React.FC<IProps> = ({ show, onHide, itemTobeEdited }) => {
-    const {state, dispatch} = useContext(context);
+    const reduxTasks = useSelector((state:any) => state.todo.Tasks)
+    const reduxDispatch = useDispatch()
     const [taskName, setTaskName] = useState(itemTobeEdited.TaskName);
     const [priority, setPriority] = useState(itemTobeEdited.TaskPriority);
     const [taskDetails, setTaskDetails] = useState(itemTobeEdited.TaskDetails);
@@ -43,13 +44,13 @@ const EditModal: React.FC<IProps> = ({ show, onHide, itemTobeEdited }) => {
         setStatus(target.value)
     }
     const handleSave = () => {
-        const foundItem = state.find((item:any) => item.id === itemTobeEdited.id)
+        const foundItem = reduxTasks.find((item:any) => item.id === itemTobeEdited.id)
         taskName && (foundItem!.TaskName = taskName);
         priority && (foundItem!.TaskPriority = priority);
         status && (foundItem!.TaskStatus = status);
         selectedDate && (foundItem!.TaskDeadline = selectedDate);
         taskDetails && (foundItem!.TaskDetails = taskDetails);
-        dispatch({type:"editTask",payLoad:foundItem})
+        reduxDispatch({type:"editTask",payLoad:foundItem})
         onHide()
     }
     const handleDateChange = (date: any) => {

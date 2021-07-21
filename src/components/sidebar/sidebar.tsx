@@ -6,8 +6,8 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import { BsFunnelFill } from "react-icons/bs";
 import SelectInput from '../selectInput/SelectInput';
-import {useState, useEffect,useContext} from 'react'
-import {context} from '../../App'
+import {useState, useEffect} from 'react'
+import { useSelector, useDispatch } from 'react-redux';
 const useStyles = makeStyles({
     list: {
         width: 250,
@@ -20,43 +20,44 @@ const useStyles = makeStyles({
 type Anchor = 'left' | 'right';
 
 export default function TemporaryDrawer() {
-    const {state,dispatch,copyState, copyDispatch} = useContext(context);
+    const copiedReduxTasks = useSelector((state:any) => state.todo.copiedTasks)
+    const reduxDispatch = useDispatch()
     const [priority, setPriority] = useState("All");
     const [status, setStatus] = useState("All");
     const [deadline, setDeadline] = useState("All");
     useEffect(()=>{
         //filters just based on priority
         if(priority !== "All" && status === "All" && deadline === "All")
-            dispatch({type:'sidebarFilterPriority',payLoad:priority,copiedTasks:[...copyState]})
+            reduxDispatch({type:'sidebarFilterPriority',payLoad:priority,copiedTasks:copiedReduxTasks})
         //filters just based on status
         else if(status !== "All" && priority === "All" && deadline === "All")
-            dispatch({type:'sidebarFilterStatus',payLoad:status,copiedTasks:[...copyState]})
+            reduxDispatch({type:'sidebarFilterStatus',payLoad:status,copiedTasks:copiedReduxTasks})
         //filters just based on deadline
         else if(deadline !== "All" && priority === "All" && status === "All")
-            dispatch({type:"sidebarFilterDeadline",payLoad:filterByDeadline()})
+            reduxDispatch({type:"sidebarFilterDeadline",payLoad:filterByDeadline()})
         //filters based on priority and status
         else if(status !== "All" && priority !== "All" && deadline === "All")
-            dispatch({type:"sidebarFilterPriorityStatus", payLoad:[priority,status],copiedTasks:[...copyState]})
+            reduxDispatch({type:"sidebarFilterPriorityStatus", payLoad:[priority,status],copiedTasks:copiedReduxTasks})
         //filters based on priority and deadline
         else if(status === "All" && priority !== "All" && deadline !== "All")
-            dispatch({type:"sidebarFilterPriority",payLoad:priority,copiedTasks:filterByDeadline()})
+            reduxDispatch({type:"sidebarFilterPriority",payLoad:priority,copiedTasks:filterByDeadline()})
         //filters based on status and deadline
         else if(status !== "All" && priority === "All" && deadline !== "All")
-            dispatch({type:"sidebarFilterStatus",payLoad:status,copiedTasks:filterByDeadline()})
+            reduxDispatch({type:"sidebarFilterStatus",payLoad:status,copiedTasks:filterByDeadline()})    
         //filters based on all options
         else if(deadline !== "All" && priority !== "All" && status !== "All")
-            dispatch({type:"sidebarFilterPriorityStatus",payLoad:[priority,status],copiedTasks:filterByDeadline()})
+            reduxDispatch({type:"sidebarFilterPriorityStatus",payLoad:[priority,status],copiedTasks:filterByDeadline()})
         //filters no item
         else if(deadline === "All" && priority == "All" && status === "All")
-            dispatch({type:"returnCopyState",copiedTasks:[...copyState]})
+            reduxDispatch({type:"returnCopyState",copiedTasks:copiedReduxTasks})
     },[deadline,priority,status])
     const filterByDeadline = ()=>{
         if(deadline === 'Overdue' )
-            return copyState.filter((item:any)=> item.TaskDeadline.getDate() < new Date().getDate())
+            return copiedReduxTasks.filter((item:any)=> item.TaskDeadline.getDate() < new Date().getDate())
         else if(deadline === 'For the future')
-            return copyState.filter((item:any)=> item.TaskDeadline.getDate() > new Date().getDate())
+            return copiedReduxTasks.filter((item:any)=> item.TaskDeadline.getDate() > new Date().getDate())
         else if(deadline === 'For today')
-            return copyState.filter((item:any)=> item.TaskDeadline.getDate() === new Date().getDate())
+            return copiedReduxTasks.filter((item:any)=> item.TaskDeadline.getDate() === new Date().getDate())
     }
     const classes = useStyles();
     const [Nstate, setState] = React.useState({
